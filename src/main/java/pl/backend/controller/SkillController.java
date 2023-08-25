@@ -20,20 +20,12 @@ public class SkillController {
 
     @GetMapping
     public ResponseEntity<List<Skill>> getSkills() {
-        try {
-            return ResponseEntity.ok(skillService.getAllSkills());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        return ResponseEntity.ok(skillService.getAllSkills());
     }
 
     @PostMapping
     public ResponseEntity<Skill> addSkill(@RequestBody Skill skill) {
-        try {
-            Skill newSkill = skillService.addSkill(skill);
-            return ResponseEntity.ok(newSkill);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        Skill newSkill = skillService.addSkill(skill);
+        return new ResponseEntity<>(newSkill, HttpStatus.CREATED);
     }
 }
