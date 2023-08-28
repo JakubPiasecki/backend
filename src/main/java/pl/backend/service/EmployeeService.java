@@ -1,52 +1,65 @@
 package pl.backend.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import pl.backend.dto.EmployeeDTO;
 import pl.backend.entity.Employee;
+import pl.backend.entity.Skill;
 import pl.backend.exception.*;
+import pl.backend.mapper.EmployeeMapper;
 import pl.backend.repo.EmployeeRepository;
+import pl.backend.repo.SkillRepository;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final EmployeeMapper employeeMapper;
 
-    public EmployeeService(EmployeeRepository employeeRepository) {
+    private final SkillRepository skillRepository;
+    public EmployeeService(EmployeeRepository employeeRepository,SkillRepository skillRepository, EmployeeMapper employeeMapper) {
         this.employeeRepository = employeeRepository;
+        this.employeeMapper = employeeMapper;
+        this.skillRepository = skillRepository;
     }
 
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+    public List<EmployeeDTO> getAllEmployees() {
+        return employeeRepository.findAll().stream()
+                .map(employeeMapper::entityToDTO)
+                .collect(Collectors.toList());
     }
 
-    public Employee getEmployeeById(UUID id) {
+    public EmployeeDTO getEmployeeById(UUID id) {
         checkEmployeeExistsById(id);
-        return employeeRepository.findById(id).orElse(null);
+        Employee employee = employeeRepository.findById(id).orElse(null);
+        return employeeMapper.entityToDTO(employee);
     }
-
-    public Employee addEmployee(Employee employee) {
+    @Transactional
+    public EmployeeDTO addEmployee(EmployeeDTO employeeDTO) {
+        Employee employee = employeeMapper.dtoToEntity(employeeDTO);
+        List<Skill> skills = skillRepository.findAllById(employeeDTO.skillsIds());
+        employee.setSkills(skills);
+        employee.setManager(employeeRepository.findById(employeeDTO.managerId()).orElse(null));
         validateEmployee(employee);
-        UUID managerId = employee.getManager().getId();
-        if (managerId != null) {
-            Employee manager = employeeRepository.findById(managerId)
-                    .orElseThrow(() -> new EmployeeNotFoundException("Manager with id " + managerId + " not found"));
-            employee.setManager(manager);
-        }
-        return employeeRepository.save(employee);
+        return employeeMapper.entityToDTO(employeeRepository.save(employee));
     }
 
-
-    public Employee updateEmployee(UUID id, Employee updatedEmployee) {
+    @Transactional
+    public EmployeeDTO updateEmployee(UUID id, EmployeeDTO updatedEmployeeDTO) {
+        Employee updatedEmployee = employeeMapper.dtoToEntity(updatedEmployeeDTO);
         validateEmployee(updatedEmployee);
         checkEmployeeExistsById(id);
         validateIdConsistency(id, updatedEmployee.getId());
-
+        List<Skill> skills = skillRepository.findAllById(updatedEmployeeDTO.skillsIds());
+        updatedEmployee.setSkills(skills);
+        updatedEmployee.setManager(employeeRepository.findById(updatedEmployeeDTO.managerId()).orElse(null));
         updatedEmployee.setId(id);
-        return employeeRepository.save(updatedEmployee);
+        return employeeMapper.entityToDTO(employeeRepository.save(updatedEmployee));
     }
-
 
     public void deleteEmployee(UUID id) {
         checkEmployeeExistsById(id);
