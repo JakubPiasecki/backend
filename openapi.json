@@ -62,8 +62,8 @@
               }
             }
           },
-          "404": {
-            "description": "Employee not found"
+          "400": {
+            "description": "Bad Request"
           }
         },
         "tags": [
