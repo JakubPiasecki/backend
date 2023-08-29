@@ -25,6 +25,4 @@ public abstract class EmployeeMapper {
     public List<Integer> getSkillId(List<Skill> skills) {
         return skills.stream().map(Skill::getId).toList();
     }
-
-
 }
