@@ -24,7 +24,6 @@ public class Employee {
     private List<Skill> skills;
 
     @ManyToOne
-    @JoinColumn(name = "manager_id")
     private Employee manager;
 
 }

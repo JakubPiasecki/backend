@@ -6,4 +6,5 @@ import pl.backend.entity.Skill;
 import java.util.UUID;
 
 public interface SkillRepository extends JpaRepository<Skill, Integer> {
+    boolean existsByName(String value);
 }
