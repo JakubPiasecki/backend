@@ -66,6 +66,13 @@ public class EmployeeService {
         employeeRepository.deleteById(id);
     }
 
+    public List<EmployeeDTO> getEmployeesByName(String name) {
+        return employeeRepository.findByFirstNameIgnoreCaseContaining(name).stream()
+                .map(employeeMapper::entityToDTO)
+                .collect(Collectors.toList());
+    }
+
+
     private void populateEmployeeFields(Employee employee, EmployeeDTO employeeDTO) {
         List<Skill> skills = skillRepository.findAllById(employeeDTO.skillsIds());
         employee.setSkills(skills);
