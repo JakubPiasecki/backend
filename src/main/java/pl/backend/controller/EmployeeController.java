@@ -6,11 +6,14 @@ import org.springframework.web.bind.annotation.*;
 import pl.backend.dto.EmployeeDTO;
 import pl.backend.service.EmployeeService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/employees")
+@CrossOrigin
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -30,6 +33,11 @@ public class EmployeeController {
         return ResponseEntity.ok(employee);
     }
 
+    @GetMapping(params = "name")
+    public ResponseEntity<List<EmployeeDTO>> getEmployeesByName(@RequestParam(required = false) String name) {
+        return ResponseEntity.ok(employeeService.getEmployeesByName(name));
+    }
+
     @PostMapping
     public ResponseEntity<EmployeeDTO> createEmployee(@RequestBody EmployeeDTO employeeDTO) {
         EmployeeDTO createdEmployee = employeeService.addEmployee(employeeDTO);
@@ -43,8 +51,13 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{employeeId}")
-    public ResponseEntity<String> deleteEmployee(@PathVariable UUID employeeId) {
+    public ResponseEntity<Map<String, String>> deleteEmployee(@PathVariable UUID employeeId) {
         employeeService.deleteEmployee(employeeId);
-        return ResponseEntity.ok("Employee deleted successfully");
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Employee deleted successfully");
+
+        return ResponseEntity.ok(response);
     }
+
 }
