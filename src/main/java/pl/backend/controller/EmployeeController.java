@@ -34,7 +34,7 @@ public class EmployeeController {
     }
 
     @GetMapping(params = "name")
-    public ResponseEntity<List<EmployeeDTO>> getEmployeesByName(@RequestParam String name) {
+    public ResponseEntity<List<EmployeeDTO>> getEmployeesByName(@RequestParam(required = false) String name) {
         return ResponseEntity.ok(employeeService.getEmployeesByName(name));
     }
 

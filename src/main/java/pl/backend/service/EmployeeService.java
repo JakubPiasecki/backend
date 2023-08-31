@@ -72,7 +72,6 @@ public class EmployeeService {
                 .collect(Collectors.toList());
     }
 
-
     private void populateEmployeeFields(Employee employee, EmployeeDTO employeeDTO) {
         List<Skill> skills = skillRepository.findAllById(employeeDTO.skillsIds());
         employee.setSkills(skills);
