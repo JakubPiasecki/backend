@@ -54,7 +54,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void testGetById() {
+    void shouldReturnEmployeeById() {
         // Given
         when(employeeRepository.existsById(any(UUID.class))).thenReturn(true);
         when(employeeRepository.findById(any(UUID.class))).thenReturn(Optional.of(employee));
@@ -68,12 +68,74 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void testGetByInvalidId() {
+    void shouldThrowEmployeeNotFoundExceptionForInvalidId() {
         // Given
         when(employeeRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
         // When & Then
         assertThatThrownBy(() -> employeeService.getEmployeeById(UUID.randomUUID()))
                 .isInstanceOf(EmployeeNotFoundException.class);
+    }
+
+    @Test
+    void shouldThrowEmployeeNotFoundExceptionWhenUpdatingNonexistentEmployee() {
+        // Given
+        UUID nonExistentEmployeeId = UUID.randomUUID();
+        when(employeeRepository.existsById(nonExistentEmployeeId)).thenReturn(false);
+
+        // When & Then
+        assertThatThrownBy(() -> employeeService.updateEmployee(nonExistentEmployeeId, employeeDTO))
+                .isInstanceOf(EmployeeNotFoundException.class);
+    }
+
+    @Test
+    void shouldReturnAllEmployees() {
+        // Given
+        List<Employee> employees = Arrays.asList(new Employee(), new Employee());
+        when(employeeRepository.findAll()).thenReturn(employees);
+
+        // When
+        List<EmployeeDTO> result = employeeService.getAllEmployees();
+
+        // Then
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void shouldDeleteEmployee() {
+        // Given
+        UUID employeeId = UUID.randomUUID();
+        when(employeeRepository.existsById(employeeId)).thenReturn(true);
+
+        // When
+        employeeService.deleteEmployee(employeeId);
+
+        // Then
+        verify(employeeRepository, times(1)).deleteById(employeeId);
+    }
+
+    @Test
+    void shouldThrowEmployeeNotFoundExceptionWhenDeletingNonexistentEmployee() {
+        // Given
+        UUID nonExistentEmployeeId = UUID.randomUUID();
+        when(employeeRepository.existsById(nonExistentEmployeeId)).thenReturn(false);
+
+        // When & Then
+        assertThatThrownBy(() -> employeeService.deleteEmployee(nonExistentEmployeeId))
+                .isInstanceOf(EmployeeNotFoundException.class);
+    }
+
+    @Test
+    void shouldReturnEmployeesByName() {
+        // Given
+        String name = "John";
+        List<Employee> employees = Arrays.asList(new Employee(), new Employee());
+        when(employeeRepository.findByFirstNameIgnoreCaseContaining(name)).thenReturn(employees);
+
+        // When
+        List<EmployeeDTO> result = employeeService.getEmployeesByName(name);
+
+        // Then
+        assertThat(result).hasSize(2);
     }
 }
