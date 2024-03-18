@@ -1,0 +1,230 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Employee Matrix",
+    "version": "0.1",
+    "description": "The Employee Matrix API offers comprehensive employee management capabilities. It supports CRUD operations on employee data, from listing all employees to detailed retrieval, addition, updates, and deletion based on employee IDs. Additionally, it provides features for handling employee skills and hierarchical relations with managers."
+  },
+  "servers": [
+    {
+      "url": "localhost:8080"
+    }
+  ],
+  "paths": {
+    "/api/employees": {
+      "summary": "Operations related to employee data management",
+      "get": {
+        "summary": "Get a list of all employees",
+        "description": "Returns a list of all employees",
+        "operationId": "getEmployees",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Employee"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Employees"
+        ]
+      },
+      "post": {
+        "summary": "Add new employee",
+        "description": "Add new employee",
+        "operationId": "addEmployee",
+        "requestBody": {
+          "description": "Add new employee",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Employee"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Employee"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        },
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/api/employees/{employeeId}": {
+      "parameters": [
+        {
+          "name": "employeeId",
+          "in": "path",
+          "description": "ID of the employee to fetch or delete",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Get details of a specific employee",
+        "description": "Returns details of a specific employee based on their ID",
+        "operationId": "getEmployeeById",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Employee"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found"
+          }
+        },
+        "tags": [
+          "Employees"
+        ]
+      },
+      "put": {
+        "summary": "Update existing employee",
+        "description": "Update existing employee",
+        "operationId": "updateEmployee",
+        "requestBody": {
+          "description": "Employee data to be updated",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Employee"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Employee"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found"
+          }
+        },
+        "tags": [
+          "Employees"
+        ]
+      },
+      "delete": {
+        "summary": "Delete a specific employee",
+        "description": "Deletes an employee based on their ID",
+        "operationId": "deleteEmployee",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Employee deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Employee not found"
+          }
+        },
+        "tags": [
+          "Employees"
+        ]
+      }
+    }
+},
+  "components": {
+    "schemas": {
+      "Employee": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "32c6507a-b545-4199-986a-05bf03310ed9"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Smith"
+          },
+          "employmentDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "skill1",
+              "skill2",
+              "skill3"
+            ]
+          },
+          "managerId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "example": "0f0f771a-1826-4260-9f04-af80724410bb"
+          }
+        }
+      }
+    },
+    "requestBodies": {
+      "Employee": {
+        "description": "Employee object",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Employee"
+            }
+          }
+        }
+      }
+    }
+  }
+}
